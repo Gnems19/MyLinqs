@@ -20,6 +20,16 @@ namespace Tests
                 actual.MoveNext();
                 Assert.Equal(item, actual.Current);
             }
+
+            var stringList = new List<string> { "1", "2", "3", "4", "5" };
+            var expected1 = stringList.Select(x => int.Parse(x));
+            var actual1 = new MyLinq<string>(stringList).Select(x => int.Parse(x)).GetEnumerator();
+            foreach (var item in expected1)
+            {
+                actual1.MoveNext();
+                Assert.Equal(item, actual1.Current);
+            }
+
         }
         [Fact]
         public void TestWhere()
@@ -45,6 +55,15 @@ namespace Tests
                 actual.MoveNext();
                 Assert.Equal(item, actual.Current);
             }
+
+            var stringList = new List<string> { "1", "2", "3", "4", "5" };
+            var expected1 = stringList.Select(x => int.Parse(x)).Where(x => x % 2 == 0);
+            var actual1 = new MyLinq<string>(stringList).Select(x => int.Parse(x)).Where(x => x % 2 == 0).GetEnumerator();
+            foreach (var item in expected1)
+            {
+                actual1.MoveNext();
+                Assert.Equal(item, actual1.Current);
+            }
         }
         [Fact]
         public void TestWhereSelect()
@@ -62,8 +81,10 @@ namespace Tests
         public void TestTake()
         {
             var list = new List<int> { 1, 2, 3, 4, 5 };
-            var expected = list.Take(3);
-            var actual = new MyLinq<int>(list).Take(3).GetEnumerator();
+            var expected = list
+                .Take(3);
+            var actual = new MyLinq<int>(list)
+                .Take(3).GetEnumerator();
             foreach (var item in expected)
             {
                 actual.MoveNext();
@@ -71,22 +92,52 @@ namespace Tests
             }
         }
         [Fact]
+        public void TestSelectTake()
+        {
+            var stringList = new List<string> { "1", "2", "3", "4", "5" };
+            var expected1 = stringList
+                .Select(x => int.Parse(x)).Take(3);
+            var actual1 = new MyLinq<string>(stringList)
+                .Select(x => int.Parse(x)).Take(3).GetEnumerator();
+            foreach (var item in expected1)
+            {
+                actual1.MoveNext();
+                Assert.Equal(item, actual1.Current);
+            }
+        }
+        [Fact]
         public void TestAgregate()
         {
             var list = new List<int> { 1, 2, 3, 4, 5 };
-            var expected = list.Aggregate((x, y) => x + y);
-            var actual = new MyLinq<int>(list).Aggregate((x, y) => x + y);
+            var expected = list
+                .Aggregate((x, y) => x + y);
+            var actual = new MyLinq<int>(list)
+                .Aggregate((x, y) => x + y);
             Assert.Equal(expected, actual);
 
             var list1 = new List<int> { 1, 2, 3, 4, 5 };
-            var expected1 = list1.Aggregate(0, (x, y) => x + y);
-            var actual1 = new MyLinq<int>(list1).Aggregate(0, (x, y) => x + y);
+            var expected1 = list1
+                .Aggregate(0, (x, y) => x + y);
+            var actual1 = new MyLinq<int>(list1)
+                .Aggregate(0, (x, y) => x + y);
             Assert.Equal(expected1, actual1);
 
             var evenEvensList = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
-            var expected2 = evenEvensList.Aggregate(true, (x, y) => x ^ y % 2 == 0);
-            var actual2 = new MyLinq<int>(evenEvensList).Aggregate(true, (x, y) => x ^ y % 2 == 0);
+            var expected2 = evenEvensList
+                .Aggregate(true, (x, y) => x ^ y % 2 == 0);
+            var actual2 = new MyLinq<int>(evenEvensList)
+                .Aggregate(true, (x, y) => x ^ y % 2 == 0);
             Assert.Equal(expected2, actual2);
+        }
+        [Fact]
+        public void TestSelectTakeAgregate()
+        {
+            var list = new List<int>() { 1, 2, 3, 4, 5, 6};
+            var expected = list
+                .Select(x => x * 2).Select(x => x.ToString()).Take(3).Aggregate((x, y) => x + y);
+            var actual = new MyLinq<int>(list)
+                .Select(x => x * 2).Select(x => x.ToString()).Take(3).Aggregate((x, y) => x + y);
+            Assert.Equal(expected, actual);
         }
         [Fact]
         public void TestCount()
@@ -119,6 +170,20 @@ namespace Tests
             var list = new List<int> { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 99, 999};
             var expected = list.Distinct();
             var actual = new MyLinq<int>(list).Distinct().GetEnumerator();
+            foreach (var item in expected)
+            {
+                actual.MoveNext();
+                Assert.Equal(item, actual.Current);
+            }
+        }
+        [Fact]
+        public void TestSelectDistinct()
+        {
+            var list = new List<int> { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5 };
+            var expected = list
+                .Select(x => x * 2).Select(x => x.ToString()).Distinct();
+            var actual = new MyLinq<int>(list)
+                .Select(x => x * 2).Select(x => x.ToString()).Distinct().GetEnumerator();
             foreach (var item in expected)
             {
                 actual.MoveNext();
